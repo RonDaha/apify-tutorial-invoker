@@ -25,11 +25,13 @@ Apify.main(async () => {
     } else {
         log.info(`Using API to trigger task - ${taskName}`)
         const actorRun = await Axios.post(`https://api.apify.com/v2/actor-tasks/${taskId}/runs?token=${token}&memory=${memory}`)
+        log.info(`Run id - ${actorRun.data.data.id}`)
+        log.info(`https://api.apify.com/v2/acts/${taskId}/runs/${actorRun.data.data.id}`)
         const limit = 40 // give a limit to the pooling for safety on dev
         for (let i = 0; i < limit; i++) {
             log.info('Checking task status')
             await utils.sleep(4000)
-            const taskRun = await Axios.get(`https://api.apify.com/v2/acts/${taskId}/runs/${actorRun.data.data.id}`)
+            const taskRun = await Axios.get(`https://api.apify.com/v2/actor-runs/${actorRun.data.data.id}`)
             log.info(`Task status - ${taskRun.data.data.status}`)
             if (taskRun.data.data.status === 'SUCCEEDED') {
                 datasetId = taskRun.data.data.defaultDatasetId
